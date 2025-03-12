@@ -1,0 +1,19 @@
+# .gitignore
+node_modules/
+.github/
+*.env
+
+# GitHub Personal Access Token files
+github_pat_*
+
+# IDE specific files
+.idea/
+
+# Node modules
+node_modules/
+
+# Gatsby cache
+.cache/
+
+# Public folder (unless you need to track it)
+public/
