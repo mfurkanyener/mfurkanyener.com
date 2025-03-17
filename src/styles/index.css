@@ -17,61 +17,17 @@
 body {
     margin: 0;
     font-family: 'Inter', sans-serif;
-    background: linear-gradient(to right, #0f2027, #203a43, #2c5364); /* Orijinal Gradient */
-    color: white;
+    background-color: #171c28;
+    color: #afafbf;
     padding-top: 80px;
     min-height: 100vh;
-}
 
-/* Wrapper olarak bir ortak kapsayıcı kullanıyoruz */
-.wrapper {
-    display: flex;
-    flex-direction: column; /* Başlıklar ve içerik dikey sıralanacak */
-    gap: 20px; /* Başlık ve içerik arasında boşluk */
-}
+}::-moz-selection {
+     background: #ffdc00;
+ }
 
-/* Başlıkları yan yana hizalamak için */
-.headings {
-    display: flex;
-    gap: 20px; /* Başlıklar arasındaki boşluk */
-    justify-content: flex-start;
-}
-
-/* İçerikleri yan yana yerleştirmek için */
-.content {
-    display: flex;
-    gap: 40px; /* Listeler arasında boşluk */
-}
-
-.list {
-    list-style-type: none;
-    padding-left: 0;
-}
-
-/*intro*/
-.intro-text{
-    max-width: 700px;
-    line-height: 1.8;
-}
-.intro-hello, .intro-text{
-    font-size: 2.5em;
-    text-align: left;
-}
-.intro-hello, .intro-contact, .intro-text{
-    text-align: left;
-    font-weight: 300;
-    margin-bottom: 70px;
-}
-.intro-contact{
-    max-width: 700px;
-    font-size: 1.3em;
-}
-
-/* About Section */
-.about{
-    line-height: 1.8;
-    text-align: left;
-    font-size: 1.3em;
+::selection {
+    background: #ffdc00;
 }
 
 /* Sayfa Konteyneri */
@@ -80,15 +36,56 @@ body {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    text-align: center;
+    padding: 20px;
+}
+
+/* Wrapper */
+.wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    width: 100%;
+}
+
+/* İçerik Flex Yapısı */
+.content {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 30px;
+}
+
+ul.list {
+    flex: 1;
+    min-width: 250px;
+}
+ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.img-container {
+    display: flex;
+    justify-content: flex-end; /* Sağa hizalar */
+    align-items: center;
+    width: 100%;
+}
+
+.img-container img {
+    width: 250px;
+    height: 300px;
+    border-radius: 200px;
+
 }
 
 /* Bölüm Tasarımı */
 section {
-    width: 100%;
+    width: 90%;
     max-width: 900px;
     margin: 50px auto;
-    padding: 60px 30px;
+    padding: 40px 20px;
     border-radius: 10px;
     backdrop-filter: blur(10px);
     transition: all 0.3s ease-in-out;
@@ -96,33 +93,10 @@ section {
 
 /* Başlık Tasarımı */
 h1 {
-    font-size: 2.5em;
+    font-size: 2em;
     font-weight: bold;
     color: #f4a261;
     margin-bottom: 20px;
-}
-
-/* Buton Tasarımı */
-a.button {
-    display: inline-block;
-    background: #f4a261;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 5px;
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-decoration: none;
-    margin-top: 20px;
-    transition: 0.3s;
-}
-
-a.button:hover {
-    background: #e76f51;
-    transform: scale(1.05);
-}
-
-footer {
-    margin-bottom: 2em;
     text-align: center;
 }
 
@@ -131,15 +105,12 @@ form {
     display: flex;
     flex-direction: column;
     max-width: 500px;
+    width: 100%;
     margin: auto;
-    padding: 70px;
+    padding: 40px;
     background: rgba(255, 255, 255, 0.2);
     border-radius: 8px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-}
-input {
-    justify-content: center;
-    align-items: center;
 }
 
 label {
@@ -150,8 +121,7 @@ label {
     text-align: left;
 }
 
-input,
-textarea {
+input, textarea {
     padding: 12px;
     margin: 10px 0;
     border: 1px solid #ccc;
@@ -175,9 +145,52 @@ button {
     cursor: pointer;
     transition: 0.3s;
     margin-top: 10px;
+    width: 100%;
 }
 
 button:hover {
     background: #e76f51;
     transform: scale(1.05);
+}
+
+/* Responsive Media Queries */
+@media screen and (max-width: 768px) {
+    .content {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .intro-hello, .intro-text, .intro-contact {
+        font-size: 1.8em;
+    }
+
+    .about {
+        font-size: 1.2em;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    form {
+        padding: 30px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    section {
+        padding: 30px 15px;
+    }
+
+    .intro-hello, .intro-text, .intro-contact {
+        font-size: 1.5em;
+    }
+
+    h1 {
+        font-size: 1.8em;
+    }
+
+    form {
+        padding: 20px;
+    }
 }

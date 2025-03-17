@@ -1,6 +1,8 @@
 import React, { useRef, useState } from "react";
 import Navbar from "../components/Navbar";
+import { PageContainer, Section, Form, Input, Textarea, Button } from "../styles/StyledComponents";
 import "../styles/index.css";
+import myPhoto from "../image/myPhoto.jpg";
 
 const IndexPage = () => {
     const homeRef = useRef(null);
@@ -21,6 +23,7 @@ const IndexPage = () => {
         if (section === "home") homeRef.current.scrollIntoView({ behavior: "smooth" });
         if (section === "about") aboutRef.current.scrollIntoView({ behavior: "smooth" });
         if (section === "projects") projectsRef.current.scrollIntoView({ behavior: "smooth" });
+        if (section === "skils") skilsRef.current.scrollIntoView({ behavior: "smooth" });
         if (section === "contact") contactRef.current.scrollIntoView({ behavior: "smooth" });
     };
 
@@ -40,120 +43,118 @@ const IndexPage = () => {
 
     return (
         <>
+            <PageContainer>
             <Navbar scrollToSection={scrollToSection} />
             <div className="page-container">
 
                 {/* Home Section */}
-                <section ref={homeRef} id="home">
+                <Section ref={homeRef} id="home">
                     <p className="intro-hello">Hello! 👋</p>
                     <p className="intro-text">I'm <strong>Muhammed Furkan Yener, </strong>a Computer Engineer
                         specialized in React and JavaScript, and I create innovative web solutions focused on user
                         experience and dynamic technologies.</p>
+                    <div className="img-container">
+                        <img src={myPhoto} alt="My Profile"/>
+                    </div>
                     <p className="intro-contact">Get in touch <strong>👉</strong> m.furkanyener@gmail.com</p>
-                </section>
+                </Section>
 
                 {/* About Section */}
-                <section ref={aboutRef} id="about">
+                <Section ref={aboutRef} id="about">
                     <h1>About Me</h1>
-                    <p className="about">I am an experienced, disciplined, and open-minded professional with a
-                        background in technology
-                        projects and
-                        social responsibility. I gained significant leadership experience as the leader of the corporate
-                        relations committee
-                        on the ‘Öğrencilerin Sesi’ Platform. During my internship at Controlix, I had the opportunity to
-                        acquire in-depth
-                        knowledge of IoT projects, including embedded systems, LORA networks, and commercial satellite
-                        projects.
-                        To better understand human behavior and social dynamics, I am currently pursuing a bachelor’s
-                        degree in Sociology
-                        (Open Education). My education in Sociology strengthened my communication skills in project
-                        management,
-                        enabling me to collaborate effectively with different stakeholders. I served as a reserve
-                        officer in the Public
-                        Relations Department of the Ministry of National Defense. During this time, I had the
-                        opportunity to develop my
-                        skills in strategic communication, defense industry, and military public relations. My
-                        experience at the Ministry of
-                        National Defense also enhanced my crisis management and strategic communication abilities. I
-                        gained significant
-                        experience in bridging the gap between the public and private sectors.
-                        I have also been working to develop myself in deep learning, blockchain (Web3), and data
-                        science. Additionally, I
-                        have gained experience in frontend development, particularly with JavaScript and React. I have
-                        in-depth knowledge
-                        of building dynamic and interactive user interfaces using React, and I have increased
-                        development efficiency by
-                        embracing a component-based architecture. I want to continue my career as a Frontend Developer,
-                        and I make it a
-                        point to regularly upload the projects I work on to my GitHub account to showcase my growth in
-                        this area.
-                        A reference letter is provided on the following pages.</p>
-                </section>
+                    <p className="about">I have extensive experience in technology projects and social responsibility. At the ‘Öğrencilerin Sesi’ Platform, I led community-based projects, which helped me develop a strong sense of social responsibility. During my internship at Controlix, I gained comprehensive knowledge in IoT, embedded systems, and commercial satellite projects. I continuously improve myself in innovative fields such as deep learning, blockchain (Web3), and data science. Additionally, I have strengthened my experience in building interactive and dynamic user interfaces using frontend technologies like React and JavaScript.
 
-                <section ref={skilsRef} id="skils">
+                        I aim to produce innovative solutions in the digital world by combining my leadership and technical skills. I pursue excellence in every project and strive to offer creative solutions to accelerate digital transformation. And yes, sometimes I escape from code and get lost in nature. But don’t worry, even when I set up my tent, I’m still looking for a Wi-Fi signal! </p>
+                </Section>
+
+                <Section ref={skilsRef} id="skils">
                     <h1>Skils</h1>
 
                     <div className="wrapper">
-                        <div className="headings">
-                            <h3>Languages</h3>
-                            <h3>Frameworks</h3>
-                            <h3>Tools</h3>
-                        </div>
 
                         <div className="content">
                             <ul className="list">
-                                <li>JavaScript (ES6)</li>
-                                <li>Typescript</li>
-                                <li>HTML</li>
-                                <li>CSS/Sass</li>
-                                <li>C</li>
-                                <li>C#</li>
-                                <li>C++</li>
-                                <li>Assembly</li>
+                                <h3>Languages</h3>
+                                    <li>JavaScript (ES6)</li>
+                                    <li>Typescript</li>
+                                    <li>HTML</li>
+                                    <li>CSS/Sass</li>
+                                    <li>C</li>
+                                    <li>C#</li>
+                                    <li>C++</li>
+                                    <li>Assembly</li>
                             </ul>
 
                             <ul className="list">
-                                <li>React</li>
-                                <li>Node.js</li>
-                                <li>.Net</li>
+                                <h3>Frameworks</h3>
+                                    <li>React</li>
+                                    <li>Node.js</li>
+                                    <li>.Net</li>
+                                    <li>Wordpress</li>
+                            </ul>
+                            <ul className="list">
+                                <h3>Tools</h3>
+                                    <li>Bash</li>
+                                    <li>Git & GitHub</li>
+                                    <li>Postman</li>
+                                    <li>MongoDB</li>
+                                    <li>Chrome DevTools</li>
+                            </ul>
+                            <ul className="list">
+                                <h3>Industry Knowledge</h3>
+                                    <li>R&D </li>
+                                    <li>IoT </li>
+                                    <li>Frontend</li>
+                                    <li></li>
+                            </ul>
+                            <ul className="list">
+                                <h3>Design</h3>
+                                    <li>Sketch</li>
+                                    <li>AutoCAD</li>
+                                    <li>AdobeXD</li>
+                                    <li>Figma</li>
+                                    <li>Google Web Designer</li>
+                                    <li>Altium Designer</li>
+
                             </ul>
                         </div>
                     </div>
-                </section>
+                </Section>
 
                 {/* Projects Section */}
-                <section ref={projectsRef} id="projects">
+                <Section ref={projectsRef} id="projects">
                     <h1>Projects</h1>
-                    <ul>
-                        <li>Project 1</li>
-                        <li>Project 2</li>
-                        <li>Project 3</li>
+                    <ul className="projects">
+                    <li className="project1">Project 1</li>
+                        <li className="project2">Project 2</li>
+                        <li className="project3">Project 3</li>
                     </ul>
-                </section>
+                </Section>
 
                 {/* Contact Section */}
-                <section ref={contactRef} id="contact">
+                <Section ref={contactRef} id="contact">
                     <h1>Contact Me</h1>
-                    <p>You can reach me at: <strong>m.furkanyene@gmail.com</strong></p>
-                    <form onSubmit={handleSubmit}>
+                    <p>You can reach me at: <strong>m.furkanyener@gmail.com</strong></p>
+                    <Form onSubmit={handleSubmit}>
                         <label htmlFor="name">Name:</label>
-                        <input type="text" id="name" name="name" value={formData.name} onChange={handleChange}
+                        <Input type="text" id="name" name="name" value={formData.name} onChange={handleChange}
                                required />
 
                         <label htmlFor="email">Email:</label>
-                        <input type="email" id="email" name="email" value={formData.email} onChange={handleChange}
+                        <Input type="email" id="email" name="email" value={formData.email} onChange={handleChange}
                                required />
 
                         <label htmlFor="message">Message:</label>
-                        <textarea id="message" name="message" value={formData.message} onChange={handleChange}
+                        <Textarea id="message" name="message" value={formData.message} onChange={handleChange}
                                   required />
 
-                        <button type="submit">Send Message</button>
+                        <Button type="submit">Send Message</Button>
                         {formStatus && <p>{formStatus}</p>}
-                    </form>
-                </section>
+                    </Form>
+                </Section>
 
             </div>
+            </PageContainer>
             <footer>
                 Copyright © 2025 - mfurkanyener
             </footer>
