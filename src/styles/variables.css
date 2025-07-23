@@ -1,0 +1,9 @@
+:root {
+    --brand-color: #171c28;
+    --text-color: #dafafb;
+}
+
+body {
+    background-color: var(--brand-color);
+    color: var(--text-color);
+}
