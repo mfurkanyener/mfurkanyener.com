@@ -30,6 +30,13 @@ body {
     background: #ffdc00;
 }
 
+.main-intro {
+    text-align: left;
+    width: 650px;
+    font-size: xxx-large;
+    display: inline-block;
+}
+
 /* Sayfa Konteyneri */
 .page-container {
     display: flex;
@@ -54,6 +61,7 @@ body {
     flex-wrap: wrap;
     justify-content: center;
     gap: 30px;
+
 }
 
 ul.list {
@@ -67,16 +75,20 @@ ul {
 }
 
 .img-container {
-    display: flex;
+    display: inline-block;
     justify-content: flex-end; /* Sağa hizalar */
     align-items: center;
-    width: 100%;
+    border: #e76f51 2px solid;
+
+    width: 250px;
+
 }
 
 .img-container img {
     width: 250px;
     height: 300px;
     border-radius: 200px;
+
 
 }
 
@@ -90,6 +102,11 @@ section {
     backdrop-filter: blur(10px);
     transition: all 0.3s ease-in-out;
 }
+
+.intro-header{
+    display: flex;
+}
+
 
 /* Başlık Tasarımı */
 h1 {
@@ -193,4 +210,63 @@ button:hover {
     form {
         padding: 20px;
     }
+}
+
+input[type=checkbox] {
+    height: 0;
+    width: 0;
+    visibility: hidden;
+}
+
+label {
+    cursor: pointer;
+    text-indent: -9999px;
+    width: 40px;
+    height: 25px;
+    background: grey;
+    display: block;
+    border-radius: 20px;
+    position: relative;
+}
+
+/* Switch için daireyi tanımlıyoruz */
+label:after {
+    content: '';
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border-radius: 18px;
+    transition: 0.3s;
+}
+
+/* Checked durumunda arka planı değiştir */
+input:checked + label {
+    background: #bada55;
+}
+
+/* Switch butonunu kaydıran animasyon */
+input:checked + label:after {
+    left: calc(100% - 5px);
+    transform: translateX(-100%);
+}
+
+/* Switch aktifken butonun genişliğini artır */
+label:active:after {
+    width: 26px;
+}
+
+/* Toggle'ı sabit sağ üst köşeye yerleştir */
+input[type=checkbox] + label {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10;  /* Üstte olmasını sağla */
+}
+
+footer{
+    padding-bottom: 40px;
+    text-align: center;
 }

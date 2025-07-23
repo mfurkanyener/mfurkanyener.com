@@ -42,6 +42,10 @@ const Navbar = ({ scrollToSection }) => {
                 <StyledLink onClick={() => scrollToSection("projects")}>Projects</StyledLink>
                 <StyledLink onClick={() => scrollToSection("contact")}>Contact</StyledLink>
             </NavLinks>
+
+            {/* Toggle switch sabit sağ üst köşede */}
+            <input type="checkbox" id="switch" />
+            <label htmlFor="switch">Toggle</label>
         </NavbarWrapper>
     );
 };
