@@ -1,90 +1,107 @@
 "use client";
 
-import { supabase } from "../lib/supabase";
 import { useState } from "react";
-import dynamic from "next/dynamic";
+import { supabase } from "@/lib/supabase";
 import emailjs from "@emailjs/browser";
 import ReCAPTCHA from "react-google-recaptcha";
 
 export default function SubscribeForm() {
     const [email, setEmail] = useState("");
-    const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null); // ← TAŞINDI
-    const [status, setStatus] = useState<"idle" | "loading" | "success" | "error" | "invalid-email">("idle");
+    const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
+    const [status, setStatus] = useState<
+        "idle" | "loading" | "success" | "error" | "invalid-email" | "already-subscribed"
+    >("idle");
 
-    const Countdown = dynamic(() => import("./Countdown"), { ssr: false });
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    const isLocal = typeof window !== "undefined" && window.location.hostname === "localhost";
+
+    const isValidEmail = (email: string) =>
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim().toLowerCase());
 
     const sendEmail = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!isValidEmail(email)) {
+        if (isSubmitting) return;
+        setIsSubmitting(true);
+
+        const normalizedEmail = email.trim().toLowerCase();
+
+        if (!isValidEmail(normalizedEmail)) {
             setStatus("invalid-email");
+            setIsSubmitting(false);
             return;
         }
 
-        if (!recaptchaToken) {
+        if (!isLocal && !recaptchaToken) {
             alert("Lütfen reCAPTCHA doğrulamasını tamamlayın.");
+            setIsSubmitting(false);
             return;
         }
 
         setStatus("loading");
 
         try {
-            const recaptchaRes = await fetch("/api/verify-recaptcha", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ token: recaptchaToken }),
-            });
+            if (!isLocal) {
+                const recaptchaRes = await fetch("/api/verify-recaptcha", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ token: recaptchaToken }),
+                });
 
-            const data = await recaptchaRes.json();
+                const recaptchaData = await recaptchaRes.json();
+                if (!recaptchaData.success) {
+                    console.error("reCAPTCHA doğrulama hatası:", recaptchaData["error-codes"]);
+                    setStatus("error");
+                    return;
+                }
+            }
 
-            if (!data.success) {
-                console.error("reCAPTCHA doğrulama hatası:", data["error-codes"]);
+            const { data: existing, error: lookupError } = await supabase
+                .from("subscribers")
+                .select("*")
+                .eq("email", normalizedEmail);
+
+            if (lookupError) {
+                console.error("Veritabanı sorgusu hatası:", lookupError);
                 setStatus("error");
                 return;
             }
 
-            const formData = {
-                user_email: email,
-                date: new Date().toLocaleString("tr-TR"),
-            };
+            if (existing.length > 0) {
+                setStatus("already-subscribed");
+                return;
+            }
 
             await emailjs.send(
                 process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
                 process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
-                formData,
+                {
+                    user_email: normalizedEmail,
+                    date: new Date().toLocaleString("tr-TR"),
+                },
                 process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
             );
 
-            await supabase.from("subscribers").insert([{ email }]);
+            const { error: insertError } = await supabase
+                .from("subscribers")
+                .insert([{ email: normalizedEmail }]);
+
+            if (insertError) {
+                console.error("Kayıt hatası:", insertError);
+                setStatus("error");
+                return;
+            }
 
             setStatus("success");
             setEmail("");
-        } catch (error) {
-            console.error("Form error:", error);
+        } catch (err) {
+            console.error("Form error:", err);
             setStatus("error");
+        } finally {
+            setIsSubmitting(false);
         }
-        const { data: existing, error: lookupError } = await supabase
-            .from("subscribers")
-            .select("*")
-            .eq("email", email);
-
-        if (lookupError) {
-            console.error("Veritabanı sorgusu hatası:", lookupError);
-            setStatus("error");
-            return;
-        }
-
-        if (existing.length > 0) {
-            console.warn("Bu email zaten abone olmuş.");
-            setStatus("success"); // İstersen ayrı bir durum da tanımlayabilirsin
-            return;
-        }
-
-        await supabase.from("subscribers").insert([{ email }]);
     };
-
 
     return (
         <form
@@ -106,20 +123,33 @@ export default function SubscribeForm() {
 
                 <button
                     type="submit"
-                    disabled={status === "loading"}
+                    disabled={status === "loading" || isSubmitting}
                     className="bg-black text-white px-6 py-2 rounded-md hover:bg-gray-800 transition"
                 >
                     {status === "loading" ? "Gönderiliyor..." : "Kaydol"}
                 </button>
             </div>
-            {status === "success" && <p className="text-green-500 text-sm">Başarıyla gönderildi!</p>}
-            {status === "error" && <p className="text-red-500 text-sm">Sunucu hatası oluştu, tekrar deneyin.</p>}
-            {status === "invalid-email" && <p className="text-yellow-400 text-sm">Geçersiz email adresi</p>}
-            <ReCAPTCHA
-                sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
-                onChange={(token) => setRecaptchaToken(token)}
-                theme="dark"
-            />
+
+            {status === "already-subscribed" && (
+                <p className="text-yellow-400 text-sm">Bu e-posta adresi zaten abone olmuş.</p>
+            )}
+            {status === "success" && (
+                <p className="text-green-500 text-sm">Başarıyla gönderildi!</p>
+            )}
+            {status === "error" && (
+                <p className="text-red-500 text-sm">Sunucu hatası oluştu, tekrar deneyin.</p>
+            )}
+            {status === "invalid-email" && (
+                <p className="text-yellow-400 text-sm">Geçersiz email adresi</p>
+            )}
+
+            {!isLocal && (
+                <ReCAPTCHA
+                    sitekey={process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!}
+                    onChange={(token) => setRecaptchaToken(token)}
+                    theme="dark"
+                />
+            )}
         </form>
     );
 }
