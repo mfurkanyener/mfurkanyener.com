@@ -1,4 +1,3 @@
-// /app/api/verify-recaptcha/route.ts
 import { NextResponse } from 'next/server';
 
 export async function POST(req: Request) {
@@ -18,11 +17,9 @@ export async function POST(req: Request) {
         formData.append("secret", secretKey);
         formData.append("response", token);
 
-        const response = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-            },
+        const response = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
             body: formData.toString(),
         });
 
@@ -44,7 +41,19 @@ export async function POST(req: Request) {
         return NextResponse.json({ success: true }, { status: 200 });
 
     } catch (error) {
-        console.error('reCAPTCHA server hatası:', error);
+        console.error("reCAPTCHA sunucu hatası:", error);
         return NextResponse.json({ success: false, error: 'Sunucu hatası' }, { status: 500 });
     }
+}
+
+// ✅ OPTIONS handler ekleyerek 405 hatasını engelle
+export function OPTIONS() {
+    return new Response(null, {
+        status: 204,
+        headers: {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
+        },
+    });
 }
