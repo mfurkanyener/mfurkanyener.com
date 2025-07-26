@@ -63,6 +63,7 @@ export default function SubscribeForm() {
 
             if (existing.length > 0) {
                 setStatus("already-subscribed");
+                setIsSubmitting(false);
                 return;
             }
 
