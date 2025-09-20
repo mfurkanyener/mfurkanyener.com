@@ -1,76 +1,49 @@
 import { NextResponse } from 'next/server';
 
+type VerifyResp = {
+    success: boolean;
+    'error-codes'?: string[];
+    challenge_ts?: string;
+    hostname?: string;
+    score?: number; // v2'de gelmeyebilir
+};
+
 export async function POST(req: Request) {
     try {
         const secretKey = process.env.RECAPTCHA_SECRET_KEY;
         if (!secretKey) {
-            return NextResponse.json(
-                { success: false, error: 'Sunucu yapılandırması eksik' },
-                { status: 500 }
-            );
+            return NextResponse.json({ success: false, error: 'missing_secret' }, { status: 500 });
         }
 
-        const { token } = await req.json();
+        const { token } = await req.json() as { token?: string };
         if (!token) {
-            return NextResponse.json(
-                { success: false, error: 'Token eksik' },
-                { status: 400 }
-            );
+            return NextResponse.json({ success: false, error: 'missing_token' }, { status: 400 });
         }
 
-        const formData = new URLSearchParams();
-        formData.append('secret', secretKey);
-        formData.append('response', token);
+        const form = new URLSearchParams();
+        form.append('secret', secretKey);
+        form.append('response', token);
 
-        const response = await fetch(
-            'https://www.google.com/recaptcha/api/siteverify',
-            {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: formData.toString(),
-            }
-        );
+        const r = await fetch('https://www.google.com/recaptcha/api/siteverify', {
+            method: 'POST',
+            headers: { 'content-type': 'application/x-www-form-urlencoded' },
+            body: form.toString()
+        });
 
-        const data: {
-            success: boolean;
-            challenge_ts?: string;
-            hostname?: string;
-            'error-codes'?: string[];
-            score?: number;
-        } = await response.json();
+        const data = await r.json() as VerifyResp;
 
-        // v2 için "score" olmayabilir, normaldir
-        const isSuspicious =
-            typeof data.score === 'number' && data.score < 0.5;
+        // 🔎 DEBUG: logla ve details olarak döndür
+        console.log('recaptcha verify data:', data);
 
-        if (!data.success || isSuspicious) {
-            return NextResponse.json(
-                { success: false, error: 'Doğrulama başarısız', details: data },
-                { status: 400 }
-            );
-        }
+        const suspicious = typeof data.score === 'number' && data.score < 0.5;
+        const ok = data.success && !suspicious;
 
-        return NextResponse.json({ success: true });
-    } catch (error) {
-        // tip güvenli log
-        console.error(
-            'verify-recaptcha error',
-            error instanceof Error ? error.message : error
-        );
         return NextResponse.json(
-            { success: false, error: 'Sunucu hatası' },
-            { status: 500 }
+            { ok, details: data },
+            { status: ok ? 200 : 400 }
         );
+    } catch (err) {
+        console.error('verify-recaptcha error', err instanceof Error ? err.message : err);
+        return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 });
     }
-}
-
-export function OPTIONS() {
-    return new Response(null, {
-        status: 204,
-        headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type',
-        },
-    });
 }
