@@ -1,19 +1,18 @@
 // src/app/[locale]/layout.tsx
-import "@/styles/globals.css";
 import {NextIntlClientProvider} from 'next-intl';
 import {notFound} from 'next/navigation';
 import {ReactNode} from 'react';
 import {locales, type Locale} from '../../../next-intl.config';
+import '@/styles/globals.css';
 
 export default async function LocaleLayout({
                                                children,
-                                               params
+                                               params,
                                            }: {
     children: ReactNode;
-    // DİKKAT: params artık Promise ve await edeceğiz
-    params: Promise<{ locale: string }>;
+    params: Promise<{ locale: string }>;   // Next 15: Promise!
 }) {
-    const {locale} = await params;
+    const { locale } = await params;
 
     if (!locales.includes(locale as Locale)) {
         notFound();
@@ -21,13 +20,10 @@ export default async function LocaleLayout({
 
     const messages = (await import(`@/messages/${locale}.json`)).default;
 
+    // DİKKAT: html/body YOK!
     return (
-        <html lang={locale}>
-        <body>
         <NextIntlClientProvider locale={locale} messages={messages}>
             {children}
         </NextIntlClientProvider>
-        </body>
-        </html>
     );
 }

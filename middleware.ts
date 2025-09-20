@@ -1,13 +1,14 @@
-// middleware.ts
+// middleware.ts (root)
 import createIntlMiddleware from 'next-intl/middleware';
 import {locales, defaultLocale} from './next-intl.config';
 
 export default createIntlMiddleware({
     locales,
-    defaultLocale
+    defaultLocale,
+    localePrefix: 'always',
+    localeDetection: true,
 });
 
-// "/" mutlaka ayrı yazılmalı; ardından dil-prefiksli tüm rotalar
 export const config = {
-    matcher: ['/', '/(tr|en)/:path*']
+    matcher: ['/((?!api|_next|.*\\..*).*)'],
 };
