@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+
     "target": "ES2017",
     "lib": [
       "dom",
@@ -17,11 +18,9 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "incremental": true,
-    "baseUrl": ".",
+    "baseUrl": "./",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["src/*"]
     },
     "plugins": [
       {
