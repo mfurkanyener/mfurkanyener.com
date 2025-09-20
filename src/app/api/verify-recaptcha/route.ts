@@ -1,55 +1,59 @@
 import { NextResponse } from 'next/server';
 
-type VerifyResp = {
-    success: boolean;
-    'error-codes'?: string[];
-    hostname?: string;
-    challenge_ts?: string;
-    score?: number; // v2'de normalde yok
-};
-
 export async function POST(req: Request) {
     try {
-        const secret = (process.env.RECAPTCHA_SECRET_KEY || '').trim();
-        if (!secret) {
-            return NextResponse.json({ ok: false, error: 'missing_secret' }, { status: 500 });
+        const secretKey = process.env.RECAPTCHA_SECRET_KEY;
+        if (!secretKey) {
+            console.error('RECAPTCHA_SECRET_KEY eksik');
+            return NextResponse.json({ success: false, error: 'Sunucu yapılandırması eksik' }, { status: 500 });
         }
 
-        const { token } = (await req.json()) as { token?: string };
+        const { token } = await req.json();
         if (!token) {
-            return NextResponse.json({ ok: false, error: 'missing_token' }, { status: 400 });
+            return NextResponse.json({ success: false, error: 'Token eksik' }, { status: 400 });
         }
 
-        const body = new URLSearchParams({ secret, response: token.trim() }).toString();
+        const formData = new URLSearchParams();
+        formData.append("secret", secretKey);
+        formData.append("response", token);
 
-        const r = await fetch('https://www.google.com/recaptcha/api/siteverify', {
-            method: 'POST',
-            headers: { 'content-type': 'application/x-www-form-urlencoded' },
-            body
+        const response = await fetch("https://www.google.com/recaptcha/api/siteverify", {
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: formData.toString(),
         });
 
-        const data = (await r.json()) as VerifyResp;
+        const contentType = response.headers.get("content-type");
+        if (!contentType?.includes("application/json")) {
+            const fallback = await response.text();
+            console.warn("Beklenmeyen içerik tipi:", fallback);
+            return NextResponse.json({ success: false, error: 'Geçersiz yanıt alındı' }, { status: 500 });
+        }
 
-        // v2'de score olmayabilir; varsa düşükse şüpheli say
-        const suspicious = typeof data.score === 'number' && data.score < 0.5;
-        const ok = data.success && !suspicious;
+        const data = await response.json();
+        const isSuspicious = data.score !== undefined && data.score < 0.5;
 
-        // Debug için details döndürüyoruz; her şey stabil olunca kaldırabilirsin.
-        return NextResponse.json({ ok, details: data }, { status: ok ? 200 : 400 });
-    } catch (err) {
-        console.error('verify-recaptcha error:', err);
-        return NextResponse.json({ ok: false, error: 'server_error' }, { status: 500 });
+        if (!data.success || isSuspicious) {
+            console.error('reCAPTCHA başarısız:', data['error-codes'] || data);
+            return NextResponse.json({ success: false, error: 'Doğrulama geçersiz veya şüpheli' }, { status: 400 });
+        }
+
+        return NextResponse.json({ success: true }, { status: 200 });
+
+    } catch (error) {
+        console.error("reCAPTCHA sunucu hatası:", error);
+        return NextResponse.json({ success: false, error: 'Sunucu hatası' }, { status: 500 });
     }
 }
 
-// OPTIONS şart değil ama dursun:
+// ✅ OPTIONS handler ekleyerek 405 hatasını engelle
 export function OPTIONS() {
     return new Response(null, {
         status: 204,
         headers: {
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST, OPTIONS',
-            'Access-Control-Allow-Headers': 'Content-Type',
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Methods": "POST, OPTIONS",
+            "Access-Control-Allow-Headers": "Content-Type",
         },
     });
 }
